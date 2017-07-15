@@ -7,6 +7,8 @@ def generate_exercises(limit, num_exercises):
     exercise_list = []
     for i, j in itertools.product(range(1, limit + 1), range(1, limit + 1)):
         exercise_list.append((i, j, (i) * (j)))
+    while len(exercise_list) < num_exercises:
+        exercise_list += exercise_list
     shuffle(exercise_list)
     return exercise_list[0:num_exercises]
 

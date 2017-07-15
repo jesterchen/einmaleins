@@ -1,16 +1,30 @@
 import datetime
 import itertools
-from random import shuffle
+from random import shuffle, randrange
 
 
-def generate_exercises(limit, num_exercises):
+def generate_exercises(limit, num_exercises, type_exercises):
     exercise_list = []
     for i, j in itertools.product(range(1, limit + 1), range(1, limit + 1)):
-        exercise_list.append((i, j, (i) * (j)))
+        exercise_list.append((i, j, (i) * (j), '*'))
     while len(exercise_list) < num_exercises:
         exercise_list += exercise_list
     shuffle(exercise_list)
+    if type_exercises == 'd':
+        exercise_list = [type_exercise_to_division(x) for x in exercise_list]
+    if type_exercises == 'b':
+        for i in range(len(exercise_list)):
+            if randrange(2) == 1:
+                exercise_list[i] = type_exercise_to_division(exercise_list[i])
     return exercise_list[0:num_exercises]
+
+
+def type_exercise_to_division(exercise):
+    if randrange(2) == 1:
+        exercise = exercise[2], exercise[1], exercise[0], '/'
+    else:
+        exercise = exercise[2], exercise[0], exercise[1], '/'
+    return exercise
 
 
 def get_user_input(question, default_value):
@@ -26,13 +40,21 @@ def get_user_input(question, default_value):
     return choice
 
 
+def get_user_value(question, allowed_values):
+    choice = ''
+    while choice not in allowed_values:
+        choice = str(input(question + " ")).lower()
+    return choice
+
+
 if __name__ == "__main__":
     gridsize = get_user_input("Bis zu welcher Zahl soll das 1*1 gehen? [10]", 10)
     print("OK, dann geht es bis %s*%s." % (gridsize, gridsize))
-    num_exercises = get_user_input("Wie viele Aufgaben sollen gestellt werden? [%s] " % (gridsize ** 2),
+    num_exercises = get_user_input("Wie viele Aufgaben sollen gestellt werden? [%s]" % (gridsize ** 2),
                                    gridsize ** 2)
     print("Es werden also %i Aufgaben gestellt." % (num_exercises))
-    exercise_list = generate_exercises(gridsize, num_exercises)
+    type_exercises = get_user_value("Nur (M)ultiplikation, nur (D)ivision oder (b)eides?", ('m', 'd', 'b'))
+    exercise_list = generate_exercises(gridsize, num_exercises, type_exercises)
     incorrect_answers = 0
     started = datetime.datetime.now().replace(microsecond=0)
     while len(exercise_list) > 0:
@@ -42,7 +64,7 @@ if __name__ == "__main__":
         result = ''
         failed = False
         while True:
-            result = input(str(exercise[0]) + " * " + str(exercise[1]) + " = ")
+            result = input(str(exercise[0]) + ' ' + exercise[3] + ' ' + str(exercise[1]) + " = ")
             if result != str(exercise[2]):
                 if not failed:
                     print("Das Ergebnis ist leider nicht richtig. Versuche es noch einmal.")

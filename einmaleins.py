@@ -13,9 +13,13 @@ def generate_exercises(limit, num_exercises, type_exercises):
     if type_exercises == 'd':
         exercise_list = [type_exercise_to_division(x) for x in exercise_list]
     if type_exercises == 'b':
+        global percentage_division
+        counter = 0
         for i in range(len(exercise_list)):
-            if randrange(2) == 1:
+            if randrange(100) <= percentage_division:
+                counter+=1
                 exercise_list[i] = type_exercise_to_division(exercise_list[i])
+        print(str(counter)+" von "+str(num_exercises)+" Aufgaben sind Division.")
     return exercise_list[0:num_exercises]
 
 
@@ -54,6 +58,8 @@ if __name__ == "__main__":
                                    gridsize ** 2)
     print("Es werden also %i Aufgaben gestellt." % (num_exercises))
     type_exercises = get_user_value("Nur (M)ultiplikation, nur (D)ivision oder (b)eides?", ('m', 'd', 'b'))
+    if type_exercises=='b':
+        percentage_division = get_user_input("Wieviel Prozent sollen Division sein? [50]", 50)
     exercise_list = generate_exercises(gridsize, num_exercises, type_exercises)
     incorrect_answers = 0
     started = datetime.datetime.now().replace(microsecond=0)
